@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Pay Me Back</string>
+    <string name="otpnote">Please Note: A One-Time Password (OTP) will be sent to your registered mobile number for verification. Ensure that your phone is nearby and ready to receive the OTP. Thank you for your cooperation.</string>
+    <string name="oneLineSlogan">Settle debts with ease, let Pay Me Back please.</string>
+    <string name="slogan">In debts we find woes,
+But "Pay Me Back" knows,
+Return what you owe, and watch wealth grow.</string>
+</resources>
