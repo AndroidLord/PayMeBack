@@ -102,24 +102,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
         }
 
 
-        nextFab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                // adding those list in the Firebase
-
-                for(FriendModel friend: selectedFriendsList){
-
-
-                   // databaseReference.child()
-
-
-
-                }
-
-
-            }
-        });
 
     }
 

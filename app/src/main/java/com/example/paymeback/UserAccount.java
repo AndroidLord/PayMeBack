@@ -160,8 +160,8 @@ public class UserAccount extends AppCompatActivity {
                                     assert user != null;
                                     if (user.getPhoneNo().contains(phoneNo)) {
 
-                                        Log.d(TAG, "Trying to Save Data... ");
-                                        Log.d(TAG, "Before Save User detail are ");
+                                        Log.d(TAG, "Before Saving Checking all the content of Data... ");
+                                        Log.d(TAG, "Before Saving User detail are ");
                                         Log.d(TAG, "Name: " + user.getName());
                                         Log.d(TAG, "Phone No.: " + user.getPhoneNo());
                                         Log.d(TAG, "Mail: " + user.getEmail());
@@ -343,7 +343,15 @@ public class UserAccount extends AppCompatActivity {
         // Saving Data in Local Storage
         UserPersistence userPersistence = UserPersistence.getInstance();
         Log.d(TAG, "Data Saved Successfully in Shared Preference");
-        userPersistence.saveUserData(user, getApplicationContext());
+
+        try {
+            userPersistence.saveUserData(user, getApplicationContext());
+        }
+        catch (Exception e){
+
+        }
+
+
 
     }
 

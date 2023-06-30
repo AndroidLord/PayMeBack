@@ -20,28 +20,32 @@ public class UserPersistence {
 
     name = user.getName();
     phoneNo = user.getPhoneNo();
-    mail = user.getPhoneNo();
+    mail = user.getEmail();
 
     this.context=context;
 
-    storingUserData(user, context);
+    storingUserData(user);
     }
 
-    private void storingUserData(UserModel user, Context context) {
+    private void storingUserData(UserModel user) {
 
         sharedPreferences = context.getSharedPreferences(Constants.USER_PREF_ID,MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         editor.putString("Name",name);
         editor.putString("PhoneNo",phoneNo);
-        if(!mail.isEmpty())
-            editor.putString("Mail",mail);
+
+        if(mail!=null && !mail.isEmpty() ) {
+            editor.putString("Mail", mail);
+        }
 
         editor.apply();
 
     }
 
-    public UserModel getUserData() throws Exception {
+    public UserModel getUserData(Context context) throws Exception {
+
+        this.context = context;
 
         sharedPreferences = context.getSharedPreferences(Constants.USER_PREF_ID,MODE_PRIVATE);
 

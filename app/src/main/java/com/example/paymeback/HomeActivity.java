@@ -17,8 +17,9 @@ public class HomeActivity extends AppCompatActivity {
 
         UserPersistence userPersistence = UserPersistence.getInstance();
         try {
-            UserModel userModel = userPersistence.getUserData();
+            UserModel userModel = userPersistence.getUserData(this);
             Log.d("home", "User Data is " + userModel.getName());
+            Log.d("home", "All " + userModel.toString());
 
         } catch (Exception e) {
             Log.d("home", "exception is " + e.getLocalizedMessage());

@@ -186,23 +186,21 @@ public class CreateAccount extends AppCompatActivity {
                     else{
                         // Create Account as it doesn't exits
 
-                        Map<String, String> account = new HashMap<>();
+                        UserModel user = new UserModel();
 
                         if(!name.isEmpty())
-                            account.put("Name",name);
+                            user.setName(name);
 
                         if(!mail.isEmpty())
-                            account.put("Mail",mail);
+                            user.setEmail(mail);
 
                         if(!phoneNo.isEmpty())
-                            account.put("PhoneNo",phoneNo);
+                            user.setPhoneNo(phoneNo);
 
-                        databaseReference.child(phoneNo).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        databaseReference.child(phoneNo).setValue(user).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
 
-
-                                UserModel user = new UserModel(name,phoneNo,mail);
                                 int result = phoneAuthHelper.signingInWithCredential(smsCode,verificationId,user);
 
                                 if(result==1){

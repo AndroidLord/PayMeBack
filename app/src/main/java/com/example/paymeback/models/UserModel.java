@@ -79,12 +79,10 @@ public class UserModel {
     @Override
     public String toString() {
         return "UserModel{" +
-                "userId='" + userId + '\'' +
-                ", Name='" + Name + '\'' +
+                "Name='" + Name + '\'' +
                 ", PhoneNo='" + PhoneNo + '\'' +
                 ", Mail='" + Mail + '\'' +
-                ", borrow=" + borrow +
-                ", lent=" + lent +
                 '}';
     }
 }
+
