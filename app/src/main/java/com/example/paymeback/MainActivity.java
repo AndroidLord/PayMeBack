@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
+    FirebaseAuth.AuthStateListener authStateListener;
     FirebaseUser currentUser;
 
     @Override
@@ -43,4 +44,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+
 }

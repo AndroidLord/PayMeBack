@@ -8,17 +8,17 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.paymeback.models.UserModel;
 import com.example.paymeback.utils.Constants;
+import com.example.paymeback.utils.PhoneAuthHelper;
+import com.example.paymeback.utils.UserPersistence;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,7 +40,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class CreateAccount extends AppCompatActivity {
@@ -69,6 +68,7 @@ public class CreateAccount extends AppCompatActivity {
 
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
+    PhoneAuthHelper phoneAuthHelper;
 
 
     @Override
@@ -81,7 +81,7 @@ public class CreateAccount extends AppCompatActivity {
         phoneNoEdt = findViewById(R.id.phoneNoEdtCtn);
         mailEdt = findViewById(R.id.mailEdt);
         createAccountBtn = findViewById(R.id.createAccBtn);
-        llOTP = findViewById(R.id.llOtp);
+        llOTP = findViewById(R.id.llOtp_CreateAcc);
 
         otp1 = findViewById(R.id.inputOTP1);
         otp2 = findViewById(R.id.inputOTP2);
@@ -94,6 +94,7 @@ public class CreateAccount extends AppCompatActivity {
         firebaseDatabase = FirebaseDatabase.getInstance();
 
         databaseReference = firebaseDatabase.getReference().child(Constants.USER_ACCOUNT);
+        phoneAuthHelper = new PhoneAuthHelper(this);
 
         moveOtpNumber();
 
@@ -125,7 +126,7 @@ public class CreateAccount extends AppCompatActivity {
                 }
                 else if(llOTP.getVisibility()==View.VISIBLE){
 
-                    verifyingPhoneNumber();
+                    verifyingOTP();
 
 
                 }
@@ -140,7 +141,7 @@ public class CreateAccount extends AppCompatActivity {
     }
 
 
-    private void verifyingPhoneNumber() {
+    private void verifyingOTP() {
 
         inputOTP1 = otp1.getText().toString();
         inputOTP2 = otp2.getText().toString();
@@ -194,12 +195,28 @@ public class CreateAccount extends AppCompatActivity {
                             account.put("Mail",mail);
 
                         if(!phoneNo.isEmpty())
-                            account.put("Phone Number",phoneNo);
+                            account.put("PhoneNo",phoneNo);
 
                         databaseReference.child(phoneNo).setValue(account).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void unused) {
-                                signingInWithCredential(smsCode);
+
+
+                                UserModel user = new UserModel(name,phoneNo,mail);
+                                int result = phoneAuthHelper.signingInWithCredential(smsCode,verificationId,user);
+
+                                if(result==1){
+
+                                    Toast.makeText(CreateAccount.this, "Logged In.", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(CreateAccount.this, AddFriendListActivity.class));
+                                    finishAffinity();
+
+                                }
+                                else{
+                                    Toast.makeText(CreateAccount.this, "Login Failed", Toast.LENGTH_SHORT).show();
+
+                                }
+
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -244,17 +261,29 @@ public class CreateAccount extends AppCompatActivity {
 
         Log.d(TAG, "User Phone No. " + phoneNo);
 
-        PhoneAuthOptions phoneAuthOptions = PhoneAuthOptions.newBuilder()
-                .setPhoneNumber(phoneNo)
-                .setTimeout(60L, TimeUnit.SECONDS)
+
+        PhoneAuthOptions phoneAuthOptions = phoneAuthHelper.sendVerificationCode(phoneNo)
                 .setActivity(CreateAccount.this)
                 .setCallbacks(new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
                     @Override
                     public void onVerificationCompleted(@NonNull PhoneAuthCredential phoneAuthCredential) {
 
                         progressDialog.dismiss();
+
                         Log.d(TAG, "onVerificationCompleted: ");
-                        signingInWithCredential(phoneAuthCredential);
+
+                        int result = phoneAuthHelper.signingInWithCredential(phoneAuthCredential);
+
+                        if(result==1){
+                            Toast.makeText(CreateAccount.this, "Logged In.", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(CreateAccount.this,AddFriendListActivity.class));
+                            finishAffinity();
+                        }
+                        else if(result==0){
+                            Toast.makeText(CreateAccount.this, "Login Failed", Toast.LENGTH_SHORT).show();
+                        }
+
+
 
                     }
                     @Override
@@ -284,50 +313,6 @@ public class CreateAccount extends AppCompatActivity {
         PhoneAuthProvider.verifyPhoneNumber(phoneAuthOptions);
     }
 
-    private void signingInWithCredential(String smsCode) {
-
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, smsCode);
-
-        firebaseAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                if(task.isSuccessful()){
-
-                    Toast.makeText(CreateAccount.this, "Logged In.", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(CreateAccount.this,AddFriendListActivity.class));
-                    finishAffinity();
-
-                }
-                else{
-                    Toast.makeText(CreateAccount.this, "Login Failed", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-    }
-
-    private void signingInWithCredential(PhoneAuthCredential phoneAuthCredential) {
-
-
-        firebaseAuth.signInWithCredential(phoneAuthCredential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-
-                if(task.isSuccessful()){
-
-                    Toast.makeText(CreateAccount.this, "Logged In.", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(CreateAccount.this,AddFriendListActivity.class));
-                    finishAffinity();
-
-                }
-                else{
-                    Toast.makeText(CreateAccount.this, "Login Failed", Toast.LENGTH_SHORT).show();
-                }
-
-            }
-        });
-    }
 
     private void moveOtpNumber() {
 

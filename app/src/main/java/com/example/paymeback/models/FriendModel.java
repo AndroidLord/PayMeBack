@@ -5,6 +5,8 @@ public class FriendModel {
     private String name;
     private String phoneNo;
 
+    private String mail;
+
     private Boolean visible = false;
 
     public Boolean isVisible() {

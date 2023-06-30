@@ -20,9 +20,12 @@ import android.widget.Toast;
 import com.example.paymeback.adaptor.FriendRVAdaptor;
 import com.example.paymeback.adaptor.OnFriendItemClickListener;
 import com.example.paymeback.models.FriendModel;
+import com.example.paymeback.utils.Constants;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -32,7 +35,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
     private static final String TAG = "addFriends";
 
     private ArrayList<FriendModel> friendModelArrayList;
-    private ArrayList<FriendModel> selectedList;
+    private ArrayList<FriendModel> selectedFriendsList;
 
     private RecyclerView recyclerView;
     private TextView skipTxt,selectedTxt;
@@ -40,6 +43,10 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
     private SearchView searchView;
 
     private FloatingActionButton nextFab;
+
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +59,11 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
         nextFab = findViewById(R.id.nextFabBtn);
         selectedTxt = findViewById(R.id.selectedTxt);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference().child(Constants.CHAT_ROOMS);
+
         friendModelArrayList = new ArrayList<>();
-        selectedList = new ArrayList<>();
+        selectedFriendsList = new ArrayList<>();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -91,10 +101,21 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
             accessContacts();
         }
 
+
         nextFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+                // adding those list in the Firebase
+
+                for(FriendModel friend: selectedFriendsList){
+
+
+                   // databaseReference.child()
+
+
+
+                }
 
 
             }
@@ -192,7 +213,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
     @Override
     public void onFriendItemClick(FriendModel friend) {
         //Snackbar.make(searchView,"Selected: " + friend.getName(),Snackbar.LENGTH_SHORT).show();
-        selectedList.add(friend);
+        selectedFriendsList.add(friend);
 
         FabVisibilty();
 
@@ -201,7 +222,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
 
     @Override
     public void onRemoveFriendItemClick(FriendModel friendModel) {
-        selectedList.remove(friendModel);
+        selectedFriendsList.remove(friendModel);
         showSelectedFriends();
         //Snackbar.make(searchView,"Removed: " + friendModel.getName(),Snackbar.LENGTH_SHORT).show();
         FabVisibilty();
@@ -209,7 +230,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
     }
 
     private void FabVisibilty() {
-        if(!selectedList.isEmpty()){
+        if(!selectedFriendsList.isEmpty()){
             nextFab.setVisibility(View.VISIBLE);
         }
         else nextFab.setVisibility(View.GONE);
@@ -217,7 +238,7 @@ public class AddFriendListActivity extends AppCompatActivity implements OnFriend
 
     public void showSelectedFriends(){
         String friends = "";
-        for (FriendModel friend: selectedList){
+        for (FriendModel friend: selectedFriendsList){
             friends = friend.getName() +", "+ friends;
         }
         selectedTxt.setText(friends);
